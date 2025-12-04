@@ -2,29 +2,41 @@ package ru.yandex.practicum.service.hub;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.KafkaProducerEvent;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.model.hub.*;
+import ru.yandex.practicum.service.mapper.HubEventAvroMapper;
+import ru.yandex.practicum.service.mapper.HubEventProtoMapper;
 
 @Component
 public class ScenarioRemovedService extends HubEventService<ScenarioRemovedEventAvro> {
-    public ScenarioRemovedService(KafkaProducerEvent kafkaProducerEvent, @Value("${topic.hub-events}") String topicsNames) {
-        super(kafkaProducerEvent, topicsNames);
+    public ScenarioRemovedService(
+            KafkaProducerEvent kafkaProducerEvent,
+            @Value("${topic.hub-events}") String topicsNames,
+            HubEventProtoMapper protoMapper,
+            HubEventAvroMapper avroMapper
+    ) {
+        super(kafkaProducerEvent, topicsNames, protoMapper, avroMapper);
     }
 
-    public HubEventType getType() {
-        return HubEventType.SCENARIO_REMOVED;
+    public HubEventProto.PayloadCase getType() {
+        return HubEventProto.PayloadCase.SCENARIO_REMOVED;
     }
 
-    public ScenarioRemovedEventAvro mapToAvro(HubEvent hubEvent) {
-        ScenarioRemovedEvent scenarioRemovedEvent = (ScenarioRemovedEvent) hubEvent;
-        return ScenarioRemovedEventAvro.newBuilder()
-                .setName(scenarioRemovedEvent.getName())
-                .build();
+    @Override
+    protected HubEventAvro mapHubToAvro(HubEvent hubEvent) {
+        return buildHubEventAvro(
+                hubEvent,
+                avroMapper.mapScenarioRemovedToAvro((ScenarioRemovedEvent) hubEvent)
+        );
     }
 
-    protected HubEventAvro mapToAvroHubEvent(HubEvent hubEvent) {
-        ScenarioRemovedEventAvro avro = mapToAvro(hubEvent);
-        return buildHubEventAvro(hubEvent, avro);
+    @Override
+    protected HubEvent mapHubProtoToModel(HubEventProto hubProto) {
+        return mapBaseHubProtoFieldsToHub(
+                protoMapper.mapScenarioRemovedProtoToModel(hubProto.getScenarioRemoved()),
+                hubProto
+        );
     }
 }

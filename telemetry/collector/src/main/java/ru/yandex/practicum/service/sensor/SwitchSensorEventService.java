@@ -2,32 +2,43 @@ package ru.yandex.practicum.service.sensor;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SwitchSensorAvro;
 import ru.yandex.practicum.model.sensor.SensorEvent;
-import ru.yandex.practicum.model.sensor.SensorEventType;
 import ru.yandex.practicum.kafka.KafkaProducerEvent;
 import ru.yandex.practicum.model.sensor.SwitchSensorEvent;
+import ru.yandex.practicum.service.mapper.SensorEventAvroMapper;
+import ru.yandex.practicum.service.mapper.SensorEventProtoMapper;
 
 @Component
 public class SwitchSensorEventService extends SensorEventService<SwitchSensorAvro> {
-    public SwitchSensorEventService(KafkaProducerEvent kafkaProducerEvent, @Value("${topic.sensor-events}") String topicsNames) {
-        super(kafkaProducerEvent, topicsNames);
+    public SwitchSensorEventService(
+            KafkaProducerEvent kafkaProducerEvent,
+            @Value("${topic.sensor-events}") String topicsNames,
+            SensorEventProtoMapper protoMapper,
+            SensorEventAvroMapper avroMapper
+    ) {
+        super(kafkaProducerEvent, topicsNames, protoMapper, avroMapper);
     }
 
-    public SensorEventType getType() {
-        return SensorEventType.SWITCH_SENSOR_EVENT;
+    public SensorEventProto.PayloadCase getType() {
+        return SensorEventProto.PayloadCase.SWITCH_SENSOR_EVENT;
     }
 
-    public SwitchSensorAvro mapToAvro(SensorEvent sensorEvent) {
-        SwitchSensorEvent switchSensorEvent = (SwitchSensorEvent) sensorEvent;
-        return SwitchSensorAvro.newBuilder()
-                .setState(switchSensorEvent.getState())
-                .build();
+    @Override
+    protected SensorEventAvro mapSensorEventToAvro(SensorEvent sensorEvent) {
+        return buildSensorEventAvro(
+                sensorEvent,
+                avroMapper.mapSwitchSensorToAvro((SwitchSensorEvent) sensorEvent)
+        );
     }
 
-    protected SensorEventAvro mapToAvroSensorEvent(SensorEvent sensorEvent) {
-        SwitchSensorAvro avro = mapToAvro(sensorEvent);
-        return buildSensorEventAvro(sensorEvent, avro);
+    @Override
+    protected SensorEvent mapSensorProtoToModel(SensorEventProto sensorProto) {
+        return mapBaseSensorProtoFieldsToSensor(
+                protoMapper.mapSwitchSensorProtoToModel(sensorProto.getSwitchSensorEvent()),
+                sensorProto
+        );
     }
 }

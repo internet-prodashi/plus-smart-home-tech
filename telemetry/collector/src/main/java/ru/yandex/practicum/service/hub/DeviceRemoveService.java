@@ -1,31 +1,42 @@
 package ru.yandex.practicum.service.hub;
 
 import org.springframework.beans.factory.annotation.Value;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.KafkaProducerEvent;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.model.hub.DeviceRemovedEvent;
 import ru.yandex.practicum.model.hub.HubEvent;
-import ru.yandex.practicum.model.hub.HubEventType;
+import ru.yandex.practicum.service.mapper.HubEventAvroMapper;
+import ru.yandex.practicum.service.mapper.HubEventProtoMapper;
 
 public class DeviceRemoveService extends HubEventService<DeviceRemovedEventAvro> {
-    public DeviceRemoveService(KafkaProducerEvent kafkaProducerEvent, @Value("${topic.hub-events}") String topicsNames) {
-        super(kafkaProducerEvent, topicsNames);
+    public DeviceRemoveService(
+            KafkaProducerEvent kafkaProducerEvent,
+            @Value("${topic.hub-events}") String topicsNames,
+            HubEventProtoMapper protoMapper,
+            HubEventAvroMapper avroMapper
+    ) {
+        super(kafkaProducerEvent, topicsNames, protoMapper, avroMapper);
     }
 
-    public HubEventType getType() {
-        return HubEventType.DEVICE_REMOVED;
+    public HubEventProto.PayloadCase getType() {
+        return HubEventProto.PayloadCase.DEVICE_REMOVED;
     }
 
-    public DeviceRemovedEventAvro mapToAvro(HubEvent hubEvent) {
-        DeviceRemovedEvent deviceRemovedEvent = (DeviceRemovedEvent) hubEvent;
-        return DeviceRemovedEventAvro.newBuilder()
-                .setId(deviceRemovedEvent.getId())
-                .build();
+    @Override
+    protected HubEventAvro mapHubToAvro(HubEvent hubEvent) {
+        return buildHubEventAvro(
+                hubEvent,
+                avroMapper.mapDeviceRemoveToAvro((DeviceRemovedEvent) hubEvent)
+        );
     }
 
-    protected HubEventAvro mapToAvroHubEvent(HubEvent hubEvent) {
-        DeviceRemovedEventAvro avro = mapToAvro(hubEvent);
-        return buildHubEventAvro(hubEvent, avro);
+    @Override
+    protected HubEvent mapHubProtoToModel(HubEventProto hubProto) {
+        return mapBaseHubProtoFieldsToHub(
+                protoMapper.mapDeviceAddedProtoToModel(hubProto.getDeviceAdded()),
+                hubProto
+        );
     }
 }
