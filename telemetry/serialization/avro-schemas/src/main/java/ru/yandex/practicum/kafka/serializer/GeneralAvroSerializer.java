@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class GeneralAvroSerializer implements Serializer<SpecificRecordBase> {
-    private final EncoderFactory encoderFactory;// = EncoderFactory.get();
+    private final EncoderFactory encoderFactory;
     private BinaryEncoder encoder;
 
     public GeneralAvroSerializer() {
