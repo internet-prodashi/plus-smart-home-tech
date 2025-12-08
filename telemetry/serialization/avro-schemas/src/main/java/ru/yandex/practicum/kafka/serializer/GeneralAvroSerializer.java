@@ -36,7 +36,7 @@ public class GeneralAvroSerializer implements Serializer<SpecificRecordBase> {
             }
             return result;
         } catch (IOException e) {
-            throw new SerializationException("Error in serializing data for a topic [" + topic + "]", e);
+            throw new SerializationException("Error in serializing data for a topic: " + topic, e);
         }
     }
 }
