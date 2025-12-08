@@ -44,10 +44,10 @@ public class AggregationStarter {
             consumer.subscribe(List.of(sensorsTopic));
 
             while (!Thread.currentThread().isInterrupted()) {
-                ConsumerRecords<String, SpecificRecordBase> records = consumer.poll(Duration.ofMillis(500));
+                ConsumerRecords<String, SpecificRecordBase> records = consumer.poll(Duration.ofMillis(1000));
                 int count = 0;
                 for (ConsumerRecord<String, SpecificRecordBase> record : records) {
-                    log.info("Обрабатываем сообщение: топик = {}, партиция = {}, смещение = {}, значение: {}",
+                    log.info("Processing the message: topic = {}, partition = {}, offset = {}, value: {}",
                             record.topic(), record.partition(), record.offset(), record.value());
 
                     SensorEventAvro event = (SensorEventAvro) record.value();
@@ -61,9 +61,9 @@ public class AggregationStarter {
                                 event.getHubId(),
                                 snapshot.get()
                         ));
-                        log.info("Снапшот обновлен: {}", snapshot);
+                        log.info("Snapshot updated: {}", snapshot);
                     } else {
-                        log.info("Снапшот не обновлен");
+                        log.info("Snapshot not updated");
                     }
 
                     offsets.put(
@@ -71,10 +71,10 @@ public class AggregationStarter {
                             new OffsetAndMetadata(record.offset() + 1)
                     );
 
-                    if (count % 20 == 0) {
+                    if (count % 10 == 0) {
                         consumer.commitAsync(offsets, (offsets, exception) -> {
                             if (exception != null)
-                                log.warn("Ошибка во время фиксации офсетов: {}", offsets, exception);
+                                log.warn("Error during commit offsets: {}", offsets, exception);
                         });
                     }
 
@@ -84,13 +84,13 @@ public class AggregationStarter {
             }
         } catch (WakeupException ignores) {
         } catch (Exception e) {
-            log.error("Ошибка во время обработки событий от датчиков", e);
+            log.error("Error during processing of events from sensors", e);
         } finally {
             try {
                 producer.flush();
                 consumer.commitSync();
             } finally {
-                log.info("Закрываем консьюмер и продюсер");
+                log.info("Closing consumer and producer");
                 consumer.close();
                 producer.close();
             }

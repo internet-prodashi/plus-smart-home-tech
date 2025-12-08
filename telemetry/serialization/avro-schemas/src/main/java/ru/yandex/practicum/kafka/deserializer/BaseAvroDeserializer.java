@@ -27,7 +27,7 @@ public abstract class BaseAvroDeserializer<T extends SpecificRecordBase> impleme
         try {
             return datumReader.read(null, decoderFactory.binaryDecoder(bytes, null));
         } catch (Exception e) {
-            throw new SerializationException("Ошибка десериализации сообщения из топика: " + topic, e);
+            throw new SerializationException("Error deserializing a message from a topic: " + topic, e);
         }
     }
 }
