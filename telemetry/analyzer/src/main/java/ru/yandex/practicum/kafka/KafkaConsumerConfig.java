@@ -15,7 +15,6 @@ import java.util.Properties;
 @Configuration
 @RequiredArgsConstructor
 public class KafkaConsumerConfig {
-
     private final Environment environment;
     private final SnapshotsConsumerProperties snapshotsProps;
     private final HubConsumerProperties hubProps;
