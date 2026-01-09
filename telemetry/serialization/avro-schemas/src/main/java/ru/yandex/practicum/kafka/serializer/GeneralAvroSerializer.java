@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class GeneralAvroSerializer implements Serializer<SpecificRecordBase> {
-    private final EncoderFactory encoderFactory;// = EncoderFactory.get();
+    private final EncoderFactory encoderFactory;
     private BinaryEncoder encoder;
 
     public GeneralAvroSerializer() {
@@ -36,7 +36,7 @@ public class GeneralAvroSerializer implements Serializer<SpecificRecordBase> {
             }
             return result;
         } catch (IOException e) {
-            throw new SerializationException("Error in serializing data for a topic [" + topic + "]", e);
+            throw new SerializationException("Error in serializing data for a topic: " + topic, e);
         }
     }
 }
