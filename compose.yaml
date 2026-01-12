@@ -58,6 +58,11 @@ services:
       - POSTGRES_DB=cart-db
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
 
   commerce-store-db:
     image: postgres:16.1
@@ -68,6 +73,11 @@ services:
       - POSTGRES_DB=store-db
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
 
   commerce-warehouse-db:
     image: postgres:16.1
@@ -78,3 +88,8 @@ services:
       - POSTGRES_DB=warehouse-db
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
