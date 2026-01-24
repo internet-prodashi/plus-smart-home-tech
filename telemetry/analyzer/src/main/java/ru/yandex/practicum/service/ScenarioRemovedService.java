@@ -6,8 +6,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioRemovedEventAvro;
-import ru.yandex.practicum.model.*;
-import ru.yandex.practicum.repository.*;
+import ru.yandex.practicum.model.Scenario;
+import ru.yandex.practicum.repository.ScenarioActionRepository;
+import ru.yandex.practicum.repository.ScenarioConditionRepository;
+import ru.yandex.practicum.repository.ScenarioRepository;
 
 import java.util.Optional;
 

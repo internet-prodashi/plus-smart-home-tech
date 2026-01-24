@@ -5,7 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.KafkaProducerEvent;
 import ru.yandex.practicum.kafka.telemetry.event.*;
-import ru.yandex.practicum.model.hub.*;
+import ru.yandex.practicum.model.hub.HubEvent;
+import ru.yandex.practicum.model.hub.ScenarioAddedEvent;
 import ru.yandex.practicum.service.mapper.HubEventAvroMapper;
 import ru.yandex.practicum.service.mapper.HubEventProtoMapper;
 
