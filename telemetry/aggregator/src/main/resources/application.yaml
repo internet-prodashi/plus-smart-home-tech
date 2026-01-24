@@ -1,26 +1,20 @@
-topic:
-  telemetry-sensors: telemetry.sensors.v1
-  telemetry-snapshots: telemetry.snapshots.v1
-  
 spring:
-  kafka:
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
-      bootstrap-servers: localhost:9092
-    consumer:
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: ru.yandex.practicum.kafka.deserializer.SensorEventDeserializer
-      group-id: sensorEvent.group.id
-      client-id: SensorEventConsumer
-      enable-auto-commit: false
-      bootstrap-servers: localhost:9092
+  application:
+    name: aggregator
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-server
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000
 
-logging:
-  level:
-    org:
-      springframework:
-        kafka: INFO
-    ru:
-      yandex:
-        practicum: TRACE
+eureka:
+  client:
+    registerWithEureka: false
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
